@@ -5,11 +5,12 @@ set -o errexit
 # Install dependencies
 pip install -r requirements.txt
 
+# Reset database to fix schema conflicts
+python manage.py migrate service_requests zero --fake
+python manage.py migrate
+
 # Collect static files
 python manage.py collectstatic --no-input
-
-# Run database migrations
-python manage.py migrate
 
 # Create superuser if it doesn't exist (optional)
 python manage.py shell -c "
