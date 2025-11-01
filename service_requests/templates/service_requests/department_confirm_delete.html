@@ -1,0 +1,80 @@
+{% extends 'service_requests/base.html' %}
+
+{% block title %}Delete Department - {{ department.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Confirm Delete
+                </h4>
+            </div>
+            <div class="card-body">
+                {% if request_count > 0 %}
+                <!-- Cannot Delete - Has Associated Requests -->
+                <div class="alert alert-warning">
+                    <i class="fas fa-shield-alt"></i>
+                    <strong>Cannot Delete Department</strong>
+                    <br>
+                    This department has {{ request_count }} associated service request{{ request_count|pluralize }}.
+                </div>
+                
+                <div class="mb-3">
+                    <h5>Department Details:</h5>
+                    <ul class="list-unstyled">
+                        <li><strong>Name:</strong> {{ department.name }}</li>
+                        <li><strong>Code:</strong> {{ department.code }}</li>
+                        <li><strong>Manager:</strong> {{ department.manager|default:"None assigned" }}</li>
+                        <li><strong>Service Requests:</strong> {{ request_count }}</li>
+                    </ul>
+                </div>
+                
+                <p class="text-muted">
+                    To maintain data integrity, departments with associated service requests cannot be deleted. 
+                    You can edit the department details instead.
+                </p>
+                
+                <div class="text-center">
+                    <a href="{% url 'department_edit' department.id %}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit Department
+                    </a>
+                    <a href="{% url 'department_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+                
+                {% else %}
+                <!-- Can Delete - No Associated Requests -->
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Warning!</strong> This action cannot be undone.
+                </div>
+                
+                <p>Are you sure you want to delete the following department?</p>
+                
+                <div class="bg-light p-3 rounded mb-3">
+                    <h5 class="mb-2">{{ department.name }}</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li><strong>Code:</strong> {{ department.code }}</li>
+                        <li><strong>Manager:</strong> {{ department.manager|default:"None assigned" }}</li>
+                        <li><strong>Created:</strong> {{ department.created_at|date:"F d, Y" }}</li>
+                    </ul>
+                </div>
+                
+                <form method="post" class="text-center">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Yes, Delete Department
+                    </button>
+                    <a href="{% url 'department_list' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -78,10 +78,10 @@
             </div>
         </div>
         
-        {% if recent_requests %}
+        {% if user.is_authenticated and recent_requests %}
         <div class="card mt-3">
             <div class="card-header bg-secondary text-white">
-                <h6 class="mb-0"><i class="fas fa-clock"></i> Recent Requests</h6>
+                <h6 class="mb-0"><i class="fas fa-clock"></i> Recent Requests (Admin View)</h6>
             </div>
             <div class="card-body">
                 {% for request in recent_requests %}
@@ -89,7 +89,7 @@
                     <div>
                         <small class="text-muted">#{{ request.id }}</small><br>
                         <strong>{{ request.requester_name }}</strong><br>
-                        <small>{{ request.category|title }}</small>
+                        <small>{{ request.get_category_display }}</small>
                     </div>
                     <span class="badge bg-{% if request.status == 'pending' %}warning{% elif request.status == 'in_progress' %}info{% elif request.status == 'resolved' %}success{% else %}secondary{% endif %} status-badge">
                         {{ request.get_status_display }}
@@ -97,6 +97,12 @@
                 </div>
                 {% if not forloop.last %}<hr>{% endif %}
                 {% endfor %}
+                
+                <div class="text-center mt-3">
+                    <a href="{% url 'request_list' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-list"></i> View All Requests
+                    </a>
+                </div>
             </div>
         </div>
         {% endif %}

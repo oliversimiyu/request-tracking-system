@@ -16,11 +16,50 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.contrib.auth import views as auth_views
+from django.contrib.auth import views as auth_views, logout
+from django.shortcuts import redirect
+from django.http import HttpResponseRedirect
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
+from rest_framework.permissions import AllowAny
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
+def profile_redirect(request):
+    """Redirect from accounts/profile/ to dashboard"""
+    return redirect('/dashboard/')
+
+def logout_view(request):
+    """Custom logout view that accepts GET requests"""
+    logout(request)
+    return HttpResponseRedirect('/')
+
+# Create public versions of the Spectacular views
+class PublicSpectacularAPIView(SpectacularAPIView):
+    permission_classes = [AllowAny]
+
+class PublicSpectacularSwaggerView(SpectacularSwaggerView):
+    permission_classes = [AllowAny]
+
+class PublicSpectacularRedocView(SpectacularRedocView):
+    permission_classes = [AllowAny]
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('service_requests.urls')),
-    path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
+    
+    # API URLs
+    path('', include('service_requests.api_urls')),
+    
+    # API Documentation (publicly accessible)
+    path('api/schema/', PublicSpectacularAPIView.as_view(), name='schema'),
+    path('api-docs/', PublicSpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api-docs/redoc/', PublicSpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    
+    # Authentication
+    path('login/', auth_views.LoginView.as_view(
+        template_name='registration/login.html',
+        redirect_authenticated_user=True
+    ), name='login'),
+    path('logout/', logout_view, name='logout'),
+    path('accounts/profile/', profile_redirect, name='profile'),
 ]

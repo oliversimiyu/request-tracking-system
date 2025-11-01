@@ -22,6 +22,7 @@ class ServiceRequest(models.Model):
     ]
     
     requester_name = models.CharField(max_length=100)
+    requester_email = models.EmailField(max_length=255, blank=True)
     department = models.CharField(max_length=100)
     category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
     description = models.TextField()
