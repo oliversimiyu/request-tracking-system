@@ -1,0 +1,181 @@
+{% extends 'service_requests/base.html' %}
+
+{% block title %}Request #{{ service_request.id }} Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="fas fa-ticket-alt"></i> Request #{{ service_request.id }} Details
+                </h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Requester:</strong><br>
+                        {{ service_request.requester_name }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Department:</strong><br>
+                        {{ service_request.department }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Category:</strong><br>
+                        <span class="badge bg-light text-dark">{{ service_request.get_category_display }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Status:</strong><br>
+                        <span class="badge bg-{% if service_request.status == 'pending' %}warning{% elif service_request.status == 'in_progress' %}info{% elif service_request.status == 'resolved' %}success{% else %}secondary{% endif %}">
+                            {{ service_request.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Created:</strong><br>
+                        {{ service_request.created_at|date:"F d, Y H:i" }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Last Updated:</strong><br>
+                        {{ service_request.updated_at|date:"F d, Y H:i" }}
+                    </div>
+                </div>
+                {% if service_request.assigned_to %}
+                <div class="mb-3">
+                    <strong>Assigned To:</strong><br>
+                    <i class="fas fa-user"></i> {{ service_request.assigned_to.get_full_name|default:service_request.assigned_to.username }}
+                </div>
+                {% endif %}
+                <div class="mb-3">
+                    <strong>Description:</strong><br>
+                    <div class="border p-3 bg-light">
+                        {{ service_request.description|linebreaks }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        {% if user.is_authenticated %}
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="fas fa-cogs"></i> Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="statusSelect" class="form-label">Update Status:</label>
+                    <select id="statusSelect" class="form-select" onchange="updateRequestStatus()">
+                        {% for status_code, status_name in service_request.STATUS_CHOICES %}
+                        <option value="{{ status_code }}" 
+                                {% if service_request.status == status_code %}selected{% endif %}>
+                            {{ status_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <a href="{% url 'request_list' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Back to List
+                </a>
+                <a href="/admin/service_requests/servicerequest/{{ service_request.id }}/change/" class="btn btn-outline-secondary">
+                    <i class="fas fa-edit"></i> Edit in Admin
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="card mt-3">
+            <div class="card-header bg-info text-white">
+                <h6 class="mb-0"><i class="fas fa-info-circle"></i> Request Timeline</h6>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <i class="fas fa-plus-circle text-primary"></i>
+                        <strong>Request Created</strong><br>
+                        <small class="text-muted">{{ service_request.created_at|date:"F d, Y H:i" }}</small>
+                    </div>
+                    {% if service_request.status != 'pending' %}
+                    <div class="timeline-item">
+                        <i class="fas fa-play-circle text-info"></i>
+                        <strong>Status Updated</strong><br>
+                        <small class="text-muted">{{ service_request.updated_at|date:"F d, Y H:i" }}</small>
+                    </div>
+                    {% endif %}
+                    {% if service_request.status == 'resolved' %}
+                    <div class="timeline-item">
+                        <i class="fas fa-check-circle text-success"></i>
+                        <strong>Request Resolved</strong><br>
+                        <small class="text-muted">{{ service_request.updated_at|date:"F d, Y H:i" }}</small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function updateRequestStatus() {
+    const select = document.getElementById('statusSelect');
+    const newStatus = select.value;
+    const requestId = {{ service_request.id }};
+    updateStatus(requestId, newStatus);
+}
+
+function updateStatus(requestId, newStatus) {
+    fetch(`/service-requests/${requestId}/update-status/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+            'status': newStatus
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload(); // Refresh page to show updated status
+        } else {
+            alert('Failed to update status');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred');
+    });
+}
+</script>
+
+<style>
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 1rem;
+    border-left: 2px solid #dee2e6;
+    padding-left: 2rem;
+}
+
+.timeline-item:last-child {
+    border-left: none;
+}
+
+.timeline-item i {
+    position: absolute;
+    left: -0.75rem;
+    background: white;
+    padding: 0.25rem;
+    border-radius: 50%;
+}
+</style>
+{% endblock %}

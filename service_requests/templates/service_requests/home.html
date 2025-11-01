@@ -1,0 +1,120 @@
+{% extends 'service_requests/base.html' %}
+
+{% block title %}Submit IT Service Request{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="fas fa-plus-circle"></i> Submit New IT Service Request</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.requester_name.id_for_label }}" class="form-label">Full Name *</label>
+                            {{ form.requester_name }}
+                            {% if form.requester_name.errors %}
+                                <div class="text-danger">{{ form.requester_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="{{ form.department.id_for_label }}" class="form-label">Department *</label>
+                            {{ form.department }}
+                            {% if form.department.errors %}
+                                <div class="text-danger">{{ form.department.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.category.id_for_label }}" class="form-label">Issue Category *</label>
+                        {{ form.category }}
+                        {% if form.category.errors %}
+                            <div class="text-danger">{{ form.category.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">Description *</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger">{{ form.description.errors }}</div>
+                        {% endif %}
+                        <div class="form-text">Please provide as much detail as possible about your issue.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Submit Request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Information</h5>
+            </div>
+            <div class="card-body">
+                <h6>Common Issues:</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-key text-warning"></i> Password Reset</li>
+                    <li><i class="fas fa-download text-primary"></i> Software Installation</li>
+                    <li><i class="fas fa-print text-secondary"></i> Printer Issues</li>
+                    <li><i class="fas fa-wifi text-success"></i> Network Problems</li>
+                    <li><i class="fas fa-laptop text-danger"></i> Hardware Issues</li>
+                </ul>
+                
+                <hr>
+                
+                <h6>Check Request Status:</h6>
+                <div class="input-group">
+                    <input type="number" class="form-control" id="statusCheck" placeholder="Request ID">
+                    <button class="btn btn-outline-secondary" type="button" onclick="checkStatus()">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        {% if recent_requests %}
+        <div class="card mt-3">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0"><i class="fas fa-clock"></i> Recent Requests</h6>
+            </div>
+            <div class="card-body">
+                {% for request in recent_requests %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <small class="text-muted">#{{ request.id }}</small><br>
+                        <strong>{{ request.requester_name }}</strong><br>
+                        <small>{{ request.category|title }}</small>
+                    </div>
+                    <span class="badge bg-{% if request.status == 'pending' %}warning{% elif request.status == 'in_progress' %}info{% elif request.status == 'resolved' %}success{% else %}secondary{% endif %} status-badge">
+                        {{ request.get_status_display }}
+                    </span>
+                </div>
+                {% if not forloop.last %}<hr>{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function checkStatus() {
+    const requestId = document.getElementById('statusCheck').value;
+    if (requestId) {
+        window.location.href = `/status/${requestId}/`;
+    }
+}
+
+document.getElementById('statusCheck').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        checkStatus();
+    }
+});
+</script>
+{% endblock %}

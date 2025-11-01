@@ -1,0 +1,105 @@
+{% extends 'service_requests/base.html' %}
+
+{% block title %}Request Status - #{{ service_request.id }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-info text-white text-center">
+                <h4 class="mb-0"><i class="fas fa-search"></i> Request Status</h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h2>Request #{{ service_request.id }}</h2>
+                    <span class="badge bg-{% if service_request.status == 'pending' %}warning{% elif service_request.status == 'in_progress' %}info{% elif service_request.status == 'resolved' %}success{% else %}secondary{% endif %} fs-6">
+                        {{ service_request.get_status_display }}
+                    </span>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Requester:</strong><br>
+                        {{ service_request.requester_name }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Department:</strong><br>
+                        {{ service_request.department }}
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <strong>Category:</strong><br>
+                        <span class="badge bg-light text-dark">{{ service_request.get_category_display }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <strong>Submitted:</strong><br>
+                        {{ service_request.created_at|date:"F d, Y H:i" }}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Description:</strong><br>
+                    <div class="border p-3 bg-light">
+                        {{ service_request.description|linebreaks }}
+                    </div>
+                </div>
+                
+                {% if service_request.assigned_to %}
+                <div class="mb-3">
+                    <strong>Assigned To:</strong><br>
+                    <i class="fas fa-user"></i> {{ service_request.assigned_to.get_full_name|default:service_request.assigned_to.username }}
+                </div>
+                {% endif %}
+                
+                <div class="progress mb-3">
+                    {% if service_request.status == 'pending' %}
+                    <div class="progress-bar bg-warning" style="width: 25%"></div>
+                    {% elif service_request.status == 'in_progress' %}
+                    <div class="progress-bar bg-info" style="width: 50%"></div>
+                    {% elif service_request.status == 'resolved' %}
+                    <div class="progress-bar bg-success" style="width: 100%"></div>
+                    {% else %}
+                    <div class="progress-bar bg-secondary" style="width: 75%"></div>
+                    {% endif %}
+                </div>
+                
+                <div class="text-center">
+                    <a href="{% url 'home' %}" class="btn btn-primary">
+                        <i class="fas fa-arrow-left"></i> Back to Home
+                    </a>
+                    <button class="btn btn-outline-secondary" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center mt-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h6 class="mb-0"><i class="fas fa-question-circle"></i> What happens next?</h6>
+            </div>
+            <div class="card-body">
+                {% if service_request.status == 'pending' %}
+                <p><i class="fas fa-clock text-warning"></i> Your request is in queue and will be reviewed by our IT team soon.</p>
+                {% elif service_request.status == 'in_progress' %}
+                <p><i class="fas fa-tools text-info"></i> Our IT team is currently working on your request.</p>
+                {% elif service_request.status == 'resolved' %}
+                <p><i class="fas fa-check-circle text-success"></i> Your request has been resolved! If you have any issues, please contact IT support.</p>
+                {% else %}
+                <p><i class="fas fa-archive text-secondary"></i> This request has been closed.</p>
+                {% endif %}
+                
+                <small class="text-muted">
+                    Last updated: {{ service_request.updated_at|date:"F d, Y H:i" }}
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
