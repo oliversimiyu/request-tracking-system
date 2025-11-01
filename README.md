@@ -66,13 +66,45 @@ A Django web application for managing IT service requests with dashboard and sta
 
 ### Authentication
 - `POST /login/` - Admin login (returns session cookie)
+- `POST /logout/` - Admin logout
+- `GET /api/auth/` - DRF authentication endpoints
 
-### Public Endpoints
-- `POST /api/public/submit-request/` - Submit new request (public)
-- `GET /api/public/request-status/{id}/` - Check status (public)
+### Public Endpoints (No Authentication Required)
+- `POST /api/public/submit-request/` - Submit new service request
+- `GET /api/public/request-status/{id}/` - Check request status by ID
 
-### Authenticated Endpoints
-- `GET /api/requests/` - List requests (authenticated)
-- `POST /api/requests/{id}/update-status/` - Update status (staff only)
+### Service Requests API (Authenticated Users)
+- `GET /api/requests/` - List all service requests with filtering
+  - Query params: `?status=pending&category=hardware&department=IT&search=printer`
+- `GET /api/requests/{id}/` - Get service request details
+- `POST /api/requests/` - Create new service request (staff only)
+- `PUT /api/requests/{id}/` - Update service request (staff only)
+- `PATCH /api/requests/{id}/` - Partially update service request (staff only)
+- `DELETE /api/requests/{id}/` - Delete service request (staff only)
+- `POST /api/requests/{id}/update-status/` - Update request status (staff only)
+- `GET /api/requests/stats/` - Get service request statistics (staff only)
 
-Full API documentation: `/api-docs/`
+### Departments API (Authenticated Users)
+- `GET /api/departments/` - List all departments
+- `GET /api/departments/{id}/` - Get department details
+- `POST /api/departments/` - Create new department (staff only)
+- `PUT /api/departments/{id}/` - Update department (staff only)
+- `PATCH /api/departments/{id}/` - Partially update department (staff only)
+- `DELETE /api/departments/{id}/` - Delete department (staff only)
+- `POST /api/departments/sync-api/` - Sync departments from external API (staff only)
+- `GET /api/departments/stats/` - Get department statistics (staff only)
+
+
+### Web Interface Endpoints
+- `GET /` - Homepage with service request form
+- `GET /dashboard/` - Admin dashboard with statistics
+- `GET /requests/` - List all requests (admin view)
+- `GET /requests/{id}/` - Request detail view
+- `POST /requests/{id}/update-status/` - AJAX status update
+- `GET /status/{id}/` - Public status check page
+- `GET /departments/` - Department management
+- `POST /departments/add/` - Add new department
+- `GET /departments/{id}/edit/` - Edit department
+- `POST /departments/{id}/delete/` - Delete department
+- `POST /departments/sync-api/` - Sync from external API
+
