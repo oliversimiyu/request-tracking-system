@@ -51,6 +51,10 @@ A Django web application for managing IT service requests with dashboard and sta
 3. View/filter all requests
 4. Update request status via dropdown
 
+## Video demo
+
+[![Watch the demo](https://img.youtube.com/vi/iJYr11Qi_yg/0.jpg)](https://youtu.be/iJYr11Qi_yg)
+
 ## Technology Stack
 
 - **Backend**: Django 5.2.7, PostgreSQL
