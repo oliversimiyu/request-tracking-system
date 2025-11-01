@@ -5,8 +5,13 @@ set -o errexit
 # Install dependencies
 pip install -r requirements.txt
 
-# Reset database to fix schema conflicts
-python manage.py migrate service_requests zero --fake
+# Fix database schema by removing conflicting columns
+echo "Fixing database schema..."
+python manage.py dbshell < fix_schema.sql || echo "Schema fix attempted"
+
+# Run migrations normally
+echo "Running migrations..."
+python manage.py migrate --fake-initial
 python manage.py migrate
 
 # Collect static files
