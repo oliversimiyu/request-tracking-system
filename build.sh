@@ -9,10 +9,9 @@ pip install -r requirements.txt
 echo "Fixing database schema..."
 python manage.py dbshell < fix_schema.sql || echo "Schema fix attempted"
 
-# Run migrations normally
-echo "Running migrations..."
-python manage.py migrate --fake-initial
-python manage.py migrate
+# Mark all migrations as applied without running them
+echo "Marking migrations as applied..."
+python manage.py migrate --fake
 
 # Collect static files
 python manage.py collectstatic --no-input
