@@ -7,7 +7,7 @@ services:
     plan: free
     envVars:
       - key: PYTHON_VERSION
-        value: "3.11"
+        value: "3.11.1"
       - key: DATABASE_URL
         fromDatabase:
           name: request-tracking-db
