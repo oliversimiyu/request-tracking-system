@@ -40,6 +40,7 @@ A Django web application for managing IT service requests with dashboard and sta
 ## Admin test credentials 
 
 Username admin
+
 password admin123
 
 ## Usage
