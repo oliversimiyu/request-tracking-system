@@ -75,7 +75,7 @@ A Django web application for managing IT service requests with dashboard and sta
 
 ### Service Requests API (Authenticated Users)
 - `GET /api/requests/` - List all service requests with filtering
-  - Query params: `?status=pending&category=hardware&department=IT&search=printer`
+- Query params: `?status=pending&category=hardware&department=IT&search=printer`
 - `GET /api/requests/{id}/` - Get service request details
 - `POST /api/requests/` - Create new service request (staff only)
 - `PUT /api/requests/{id}/` - Update service request (staff only)
