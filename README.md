@@ -64,8 +64,14 @@ A Django web application for managing IT service requests with dashboard and sta
 
 ## API Endpoints
 
+### Authentication
+- `POST /login/` - Admin login (returns session cookie)
+
+### Public Endpoints
 - `POST /api/public/submit-request/` - Submit new request (public)
 - `GET /api/public/request-status/{id}/` - Check status (public)
+
+### Authenticated Endpoints
 - `GET /api/requests/` - List requests (authenticated)
 - `POST /api/requests/{id}/update-status/` - Update status (staff only)
 
