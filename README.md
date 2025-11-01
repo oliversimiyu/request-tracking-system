@@ -37,6 +37,11 @@ A Django web application for managing IT service requests with dashboard and sta
    - Admin panel: http://127.0.0.1:8000/admin/
    - Dashboard: http://127.0.0.1:8000/dashboard/
 
+## Admin test credentials 
+
+Username admin
+password admin123
+
 ## Usage
 
 ### Submit Request (Staff)
